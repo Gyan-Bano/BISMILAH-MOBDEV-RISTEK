@@ -19,7 +19,7 @@ class _HomeAppBarState extends State<HomeAppBar>
   @override
   void initState() {
     animatecontroller =
-        AnimationController(vsync: this, duration: const Duration(milliseconds: 500));
+        AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
     super.initState();
   }
 

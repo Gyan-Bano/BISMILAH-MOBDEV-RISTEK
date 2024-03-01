@@ -4,10 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_slider_drawer/flutter_slider_drawer.dart';
 import 'package:todo_app/data/database.dart';
-import 'package:todo_app/extensions/space_exs.dart';
+import 'package:todo_app/models/hive_task.dart';
 import 'package:todo_app/pages/home/home_page_appbar.dart';
-import 'package:todo_app/pages/home/slider_drawer.dart';
+import 'package:todo_app/pages/drawer/slider_drawer.dart';
 import 'package:todo_app/pages/home/task_widget.dart';
+import 'package:todo_app/pages/tasks_detail/task_view.dart';
 import 'package:todo_app/utility/dialog_box.dart';
 import 'package:todo_app/utility/todo_tile.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -24,91 +25,105 @@ class _MyHomePageState extends State<MyHomePage> {
   final List<int> testing = [222];
 
   // reference the hive box
-  final _myBox = Hive.box('mybox');
-  ToDoDatabase db = ToDoDatabase();
+  // final _myBox = Hive.box('mybox');
+  // ToDoDatabase db = ToDoDatabase();
 
-  @override
-  void initState() {
-    // TODO: implement initState
-    if (_myBox.get("TODOLIST") == null) {
-      db.toDoList = [];
-    } else {
-      db.loadData();
-    }
-    super.initState();
-  }
+  // @override
+  // void initState() {
+  //   // TODO: implement initState
+  //   if (_myBox.get("TODOLIST") == null) {
+  //     db.toDoList = [];
+  //   } else {
+  //     db.loadData();
+  //   }
+  //   super.initState();
+  // }
 
-  // text controller
-  final _controller = TextEditingController();
+  // // text controller
+  // final _controller = TextEditingController();
 
-  void checkBoxChanged(bool? value, int index) {
-    setState(() {
-      db.toDoList[index][1] = !db.toDoList[index][1];
-    });
-    db.updateDataBase();
-  }
+  // void checkBoxChanged(bool? value, int index) {
+  //   setState(() {
+  //     db.toDoList[index][1] = !db.toDoList[index][1];
+  //   });
+  //   db.updateDataBase();
+  // }
 
-  void saveNewTask() {
-    setState(() {
-      db.toDoList.add([_controller.text, false]);
-      _controller.clear();
-    });
-    Navigator.of(context).pop();
-    db.updateDataBase();
-  }
+  // void saveNewTask() {
+  //   setState(() {
+  //     db.toDoList.add([_controller.text, false]);
+  //     _controller.clear();
+  //   });
+  //   Navigator.of(context).pop();
+  //   db.updateDataBase();
+  // }
 
-  void createNewTask() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return DialogBox(
-          controller: _controller,
-          onSave: saveNewTask,
-          onCancel: () => Navigator.of(context).pop(),
-        );
-      },
-    );
-    db.updateDataBase();
-  }
+  // void createNewTask() {
+  //   showDialog(
+  //     context: context,
+  //     builder: (context) {
+  //       return DialogBox(
+  //         controller: _controller,
+  //         onSave: saveNewTask,
+  //         onCancel: () => Navigator.of(context).pop(),
+  //       );
+  //     },
+  //   );
+  //   db.updateDataBase();
+  // }
 
-  void deleteTask(int index) {
-    setState(() {
-      db.toDoList.removeAt(index);
-    });
-    db.updateDataBase();
-  }
+  // void deleteTask(int index) {
+  //   setState(() {
+  //     db.toDoList.removeAt(index);
+  //   });
+  //   db.updateDataBase();
+  // }
 
   @override
   Widget build(BuildContext context) {
     TextTheme textTheme = Theme.of(context).textTheme;
     return Scaffold(
       backgroundColor: Colors.white,
-      floatingActionButton: FloatingActionButton(
-        elevation: 10,
-        onPressed: createNewTask,
-        child: Container(
-          width: 70,
-          height: 70,
-          decoration: BoxDecoration(
-            color: Theme.of(context).primaryColor,
-            borderRadius: BorderRadius.circular(15),
-          ),
-          child: const Center(
-            child: Icon(
-              Icons.add,
-              color: Colors.white,
+      // floating action button
+      floatingActionButton: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            CupertinoPageRoute(
+              builder: (_) => const TaskView(titleTaskController: null, descriptionTaskController: null, task: null,),
+            ),
+          );
+        },
+        child: FloatingActionButton(
+          elevation: 10,
+          onPressed: null,
+          child: Container(
+            width: 70,
+            height: 70,
+            decoration: BoxDecoration(
+              color: Theme.of(context).primaryColor,
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: const Center(
+              child: Icon(
+                Icons.add,
+                color: Colors.white,
+              ),
             ),
           ),
         ),
       ),
+
       body: SliderDrawer(
         key: drawerKey,
         isDraggable: false,
-        animationDuration: 500,
+        animationDuration: 300,
 
-        // drawer 
+        // drawer
         slider: CustomDrawer(),
-        appBar: HomeAppBar(drawerKey: drawerKey,),
+        appBar: HomeAppBar(
+          drawerKey: drawerKey,
+        ),
         child: SizedBox(
           width: double.infinity,
           height: double.infinity,
@@ -198,7 +213,15 @@ class _MyHomePageState extends State<MyHomePage> {
                               key: Key(
                                 index.toString(),
                               ),
-                              child: const TaskWidget());
+                              child: TaskWidget(
+                                task: hiveTask(
+                                  id: "1", 
+                                  title: "Home Task", 
+                                  subTitle: "Cleaning the room", 
+                                  startAtDate: DateTime.now(), 
+                                  endAtDate: DateTime.now(), 
+                                  isCompleted: false),
+                              ));
                         })
                     : Column(
                         mainAxisAlignment: MainAxisAlignment.center,

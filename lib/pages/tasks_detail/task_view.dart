@@ -341,7 +341,7 @@ Widget build(BuildContext context) {
             ),
         
             Container(
-              margin: const EdgeInsets.only(top: 75),
+              margin: const EdgeInsets.only(top: 75, bottom: 75),
               child: Row(
                 mainAxisAlignment: isTaskAlreadyExsist()
                     ? MainAxisAlignment.center

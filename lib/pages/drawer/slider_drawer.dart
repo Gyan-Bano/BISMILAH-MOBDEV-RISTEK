@@ -1,22 +1,19 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:todo_app/pages/profile/profile_form.dart';
 
 class CustomDrawer extends StatelessWidget {
   CustomDrawer({super.key});
 
   // icons
   final List<IconData> icons = [
-    CupertinoIcons.home,
     CupertinoIcons.person_fill,
-    CupertinoIcons.settings,
     CupertinoIcons.info_circle_fill,
   ];
 
   List<String> texts = [
-    "Home",
     "Profile",
-    "Settings",
     "Details",
   ];
 
@@ -38,7 +35,24 @@ class CustomDrawer extends StatelessWidget {
                   itemBuilder: (BuildContext context, int index) {
                     return InkWell(
                       onTap: () {
-                        // logic tap
+                        if (index == 0) { // Assuming 0 is the index for Profile
+                          Navigator.of(context).push(PageRouteBuilder(
+                            pageBuilder: (context, animation, secondaryAnimation) => ProfileForm(backgroundColor: Theme.of(context).primaryColor,),
+                            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                              var begin = Offset(-1.0, 0.0);
+                              var end = Offset.zero;
+                              var curve = Curves.ease;
+
+                              var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+                              var offsetAnimation = animation.drive(tween);
+
+                              return SlideTransition(
+                                position: offsetAnimation,
+                                child: child,
+                              );
+                            },
+                          ));
+                        }
                       },
                       child: Container(
                         margin: const EdgeInsets.symmetric(

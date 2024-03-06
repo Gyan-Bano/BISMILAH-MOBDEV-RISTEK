@@ -21,23 +21,24 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateMixin{
+class _MyHomePageState extends State<MyHomePage>
+    with SingleTickerProviderStateMixin {
   GlobalKey<SliderDrawerState> drawerKey = GlobalKey<SliderDrawerState>();
   bool _showSortOptions = false;
   late AnimationController _controller;
   late Animation<double> _animation;
-  Set<String> _selectedFilters = {}; 
-
+  Set<String> _selectedFilters = {};
 
   @override
   void initState() {
-      super.initState();
-      _controller = AnimationController(
-        duration: const Duration(milliseconds: 300),
-        vsync: this,
-      );
-      _animation = Tween<double>(begin: 0, end: 1).animate(_controller);
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _animation = Tween<double>(begin: 0, end: 1).animate(_controller);
   }
+
   // check value of circle indicator
   dynamic valueOfIndicator(List<hiveTask> task) {
     if (task.isNotEmpty) {
@@ -63,33 +64,39 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
     TextTheme textTheme = Theme.of(context).textTheme;
 
     final base = BaseWidget.of(context);
-    String todayDate = DateFormat('EEEE, MMMM d').format(DateTime.now());
+    String todayDate = DateFormat('EEEE, MMMM d, yyyy').format(DateTime.now());
 
     return ValueListenableBuilder(
       valueListenable: base.dataStore.listenToTask(),
-    builder: (ctx, Box<hiveTask> box, Widget? child) {
-      var tasks = box.values.toList();
+      builder: (ctx, Box<hiveTask> box, Widget? child) {
+        var tasks = box.values.toList();
 
-      tasks = tasks.where((task) {
-        if (_selectedFilters.contains('Daily Task') && task.category != 'daily') {
-          return false;
-        }
-        if (_selectedFilters.contains('Priority Task') && task.category != 'priority') {
-          return false;
-        }
-        if (_selectedFilters.contains('Today Task')) {
-          DateTime today = DateTime.now();
-          today = DateTime(today.year, today.month, today.day); 
-          if (!(task.startAtDate.compareTo(today) <= 0 && task.endAtDate.compareTo(today) >= 0)) {
+        tasks = tasks.where((task) {
+          if (_selectedFilters.contains('Daily Task') &&
+              task.category != 'daily') {
             return false;
           }
-        }
+          if (_selectedFilters.contains('Priority Task') &&
+              task.category != 'priority') {
+            return false;
+          }
+          if (_selectedFilters.contains('Today Task')) {
+            DateTime now = DateTime.now();
+            DateTime todayStart = DateTime(now.year, now.month, now.day); // Start of today
+            DateTime todayEnd = DateTime(now.year, now.month, now.day, 23, 59, 59); // End of today
 
-        return true;
-      }).toList();
+            if (task.startAtDate.isAtSameMomentAs(todayStart) || task.startAtDate.isBefore(todayEnd)) {
+              if (task.endAtDate.isAtSameMomentAs(todayEnd) || task.endAtDate.isAfter(todayStart)) {
+                return true; // The task is a 'Today Task'
+              }
+            }
+            return false; // The task is not a 'Today Task'
+          }
+                    return true;
+        }).toList();
 
-      // Sort tasks if needed
-      tasks.sort((a, b) => a.endAtDate.compareTo(b.endAtDate));
+        // Sort tasks if needed
+        tasks.sort((a, b) => a.endAtDate.compareTo(b.endAtDate));
         return Scaffold(
           backgroundColor: Colors.white,
           // floating action button
@@ -203,67 +210,67 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
                   ),
 
                   // Filter section
-                 Container(
-                  
+                  Container(
                     margin: const EdgeInsets.fromLTRB(20, 20, 20, 20),
-                    child: SingleChildScrollView (
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    
-                      children: [
-
-                        Wrap(
-                          spacing: 8.0, 
-                          children: [
-                            FilterChip(
-                              label: Container(child: Text('Today Task')),
-                              selected: _selectedFilters.contains('Today Task'),
-                              showCheckmark: false,
-                              onSelected: (bool value) {
-                                setState(() {
-                                  if (value) {
-                                    _selectedFilters.add('Today Task');
-                                  } else {
-                                    _selectedFilters.remove('Today Task');
-                                  }
-                                });
-                              },
-                            ),
-                            FilterChip(
-                              label: Text('Priority Task'),
-                              selected: _selectedFilters.contains('Priority Task'),
-                              showCheckmark: false,
-                              onSelected: (bool value) {
-                                setState(() {
-                                  if (value) {
-                                    _selectedFilters.add('Priority Task');
-                                  } else {
-                                    _selectedFilters.remove('Priority Task');
-                                  }
-                                });
-                              },
-                            ),
-                            FilterChip(
-                              label: Text('Daily Task'),
-                              selected: _selectedFilters.contains('Daily Task'),
-                              showCheckmark: false,
-                              onSelected: (bool value) {
-                                setState(() {
-                                  if (value) {
-                                    _selectedFilters.add('Daily Task');
-                                  } else {
-                                    _selectedFilters.remove('Daily Task');
-                                  }
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-                      ],
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Wrap(
+                            spacing: 8.0,
+                            children: [
+                              FilterChip(
+                                label: Container(child: Text('Today Task')),
+                                selected:
+                                    _selectedFilters.contains('Today Task'),
+                                showCheckmark: false,
+                                onSelected: (bool value) {
+                                  setState(() {
+                                    if (value) {
+                                      _selectedFilters.add('Today Task');
+                                    } else {
+                                      _selectedFilters.remove('Today Task');
+                                    }
+                                  });
+                                },
+                              ),
+                              FilterChip(
+                                label: Text('Priority Task'),
+                                selected:
+                                    _selectedFilters.contains('Priority Task'),
+                                showCheckmark: false,
+                                onSelected: (bool value) {
+                                  setState(() {
+                                    if (value) {
+                                      _selectedFilters.add('Priority Task');
+                                    } else {
+                                      _selectedFilters.remove('Priority Task');
+                                    }
+                                  });
+                                },
+                              ),
+                              FilterChip(
+                                label: Text('Daily Task'),
+                                selected:
+                                    _selectedFilters.contains('Daily Task'),
+                                showCheckmark: false,
+                                onSelected: (bool value) {
+                                  setState(() {
+                                    if (value) {
+                                      _selectedFilters.add('Daily Task');
+                                    } else {
+                                      _selectedFilters.remove('Daily Task');
+                                    }
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                   ),
-                 ),
+                  ),
                   // tasks
                   Expanded(
                     child: tasks.isNotEmpty

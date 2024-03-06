@@ -49,7 +49,7 @@ class _HomeAppBarState extends State<HomeAppBar>
     var base = BaseWidget.of(context).dataStore.box;
     return SizedBox(
       width: double.infinity,
-      height: 130,
+      height: 90,
       child: Padding(
         padding: const EdgeInsets.only(top: 20),
         child: Row(

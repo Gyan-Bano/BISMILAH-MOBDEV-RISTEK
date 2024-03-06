@@ -12,7 +12,8 @@ class hiveTask extends HiveObject {
     required this.subTitle,
     required this.startAtDate,
     required this.endAtDate,
-    required this.isCompleted,
+    required this.isCompleted, 
+    required this.category,
   });
 
   @HiveField(0) // id
@@ -27,6 +28,8 @@ class hiveTask extends HiveObject {
   DateTime endAtDate;
   @HiveField(5) // is completed
   bool isCompleted;
+  @HiveField(6)
+  String category; // Changed from comma to semicolon
 
   // create new task
   factory hiveTask.create({
@@ -34,6 +37,7 @@ class hiveTask extends HiveObject {
     required String? subTitle,
     DateTime? startAtDate,
     DateTime? endAtDate,
+    required String? category,
   }) =>
       hiveTask(
         id: const Uuid().v1(),
@@ -42,5 +46,6 @@ class hiveTask extends HiveObject {
         startAtDate: startAtDate ?? DateTime.now(),
         endAtDate: endAtDate ?? DateTime.now(),
         isCompleted: false,
+        category: category ?? "",
       );
 }

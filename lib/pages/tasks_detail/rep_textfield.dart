@@ -23,7 +23,7 @@ class RepTextField extends StatelessWidget {
       child: ListTile(
         title: TextFormField(
           controller: controller,
-          maxLines: !isForDescription ? 6 : null,
+          maxLines: !isForDescription ? 3 : null,
           cursorHeight: !isForDescription ? 60 : null,
           style: TextStyle(
             color: Colors.black,

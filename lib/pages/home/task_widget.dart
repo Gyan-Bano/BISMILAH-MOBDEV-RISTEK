@@ -1,6 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:todo_app/models/hive_task.dart';
 import 'package:intl/intl.dart';
+import 'package:todo_app/pages/tasks_detail/task_view.dart';
 
 class TaskWidget extends StatefulWidget {
   const TaskWidget({
@@ -35,9 +37,20 @@ class _TaskWidgetState extends State<TaskWidget> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        // navigate to see task detail
+     onTap: () {
+      // navigate to see task detail
+        Navigator.push(
+          context, 
+          CupertinoPageRoute(
+            builder: (ctx) => TaskView(
+              titleTaskController: textEditingControllerForTitle,
+              descriptionTaskController: textEditingControllerForSubTitle,
+              task: widget.task,
+            ),
+          ),
+        );
       },
+
       child: AnimatedContainer(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
@@ -57,6 +70,8 @@ class _TaskWidgetState extends State<TaskWidget> {
           leading: GestureDetector(
             onTap: () {
               // check uncheck
+              widget.task.isCompleted = !widget.task.isCompleted;
+              widget.task.save();
             },
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 600),

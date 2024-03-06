@@ -30,6 +30,7 @@ class _TaskViewState extends State<TaskView> {
   var subTitle;
   DateTime? startDate;
   DateTime? endDate;
+  String? selectedCategory;
 
   // show selected date as string format
   String showStartDate(DateTime? date) {
@@ -92,40 +93,52 @@ class _TaskViewState extends State<TaskView> {
 
   // function for creating and updating task
   dynamic isAlreadyExsistUpdateOtherwiseCreate() {
-    // update current task
-    if (widget.titleTaskController?.text != null &&
-        widget.descriptionTaskController?.text != null) {
-      try {
-        widget.titleTaskController?.text = title;
-        widget.descriptionTaskController?.text = subTitle;
+    try {
+        if (widget.task != null) {
+          String? updatedTitle = title;
+          String? updatedSubTitle = subTitle;
 
-        widget.task?.save();
+          if (updatedTitle != null && updatedTitle != widget.task!.title) {
+            widget.task!.title = updatedTitle;
+          }
 
-        // pop page
-      } catch (e) {
-        // if user want to update but entered nothing
-        // todo
-      }
-    } else {
-      // create new task
-      if (title != null && subTitle != null) {
-        var task = hiveTask.create(
-          title: title,
-          subTitle: subTitle,
-          startAtDate: startDate,
-          endAtDate: endDate,
-        );
+          if (updatedSubTitle != null && updatedSubTitle != widget.task!.subTitle) {
+            widget.task!.subTitle = updatedSubTitle;
+          }
 
-        // adding new task to hive db using inherrited widget
-        BaseWidget.of(context).dataStore.addTask(task: task);
+          widget.task!.save();
 
-        // pop page
-      } else {
-        print("gaboleh kosong");
-        //warnig
-        // todo
-      }
+          Navigator.pop(context);
+        } else {
+          if (title != null && subTitle != null) {
+            var task = hiveTask.create(
+              title: title,
+              subTitle: subTitle,
+              startAtDate: startDate,
+              endAtDate: endDate,
+            );
+
+            BaseWidget.of(context).dataStore.addTask(task: task);
+
+            Navigator.pop(context);
+          } else {
+            print("Cannot be empty");
+            // Warning
+            // TODO: Handle empty fields case
+          }
+        }
+    } catch (e) {
+        // Handle any exceptions that occur during the update process
+        print('An error occurred while updating the task: $e');
+        // Optionally, show an error message to the user
     }
+  }
+
+  
+
+  // delete task
+  dynamic deleteTask() {
+    return widget.task?.delete();
   }
 
   @override
@@ -164,35 +177,43 @@ class _TaskViewState extends State<TaskView> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 20),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisAlignment: isTaskAlreadyExsist()
+            ? MainAxisAlignment.center
+            : MainAxisAlignment.spaceEvenly,
         children: [
-          // delete current task button
-          MaterialButton(
-            onPressed: () {},
-            minWidth: 150,
-            color: Colors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15),
-            ),
-            height: 55,
-            child: Row(
-              children: [
-                Icon(
-                  CupertinoIcons.trash_fill,
-                  color: Theme.of(context).primaryColor,
-                ),
-                const SizedBox(
-                  width: 5,
-                ),
-                Text(
-                  "Delete Task",
-                  style: TextStyle(
-                    color: Theme.of(context).primaryColor,
+          isTaskAlreadyExsist()
+              ? Container()
+              :
+              // delete current task button
+              MaterialButton(
+                  onPressed: () {
+                    deleteTask();
+                    Navigator.pop(context);
+                  },
+                  minWidth: 150,
+                  color: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  height: 55,
+                  child: Row(
+                    children: [
+                      Icon(
+                        CupertinoIcons.trash_fill,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                      const SizedBox(
+                        width: 5,
+                      ),
+                      Text(
+                        "Delete Task",
+                        style: TextStyle(
+                          color: Theme.of(context).primaryColor,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
-          ),
 
           // add or update task
           MaterialButton(
@@ -205,9 +226,9 @@ class _TaskViewState extends State<TaskView> {
               borderRadius: BorderRadius.circular(15),
             ),
             height: 55,
-            child: const Text(
-              "Add Task",
-              style: TextStyle(
+            child: Text(
+              isTaskAlreadyExsist() ? "Add Task" : "Update Task",
+              style: const TextStyle(
                 color: Colors.white,
               ),
             ),
@@ -258,7 +279,82 @@ class _TaskViewState extends State<TaskView> {
               subTitle = inputSubTitle;
             },
           ),
-
+          Container(
+            margin: const EdgeInsets.fromLTRB(20, 20, 20, 5),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 16.0, top: 16.0),
+                  child: Text(
+                    'Category',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    MaterialButton(
+                      onPressed: () {
+                        setState(() {
+                          // Set the selected category to 'priority'
+                          selectedCategory = 'priority';
+                        });
+                      },
+                      minWidth: 150,
+                      child: Text(
+                        'Priority Tasks',
+                        style: TextStyle(
+                          color: selectedCategory == 'priority'
+                              ? Colors.white
+                              : Colors.purple,
+                        ),
+                      ),
+                      color: selectedCategory == 'priority'
+                          ? Colors.purple
+                          : Colors.white,
+                      shape: RoundedRectangleBorder(
+                        side: BorderSide(color: Colors.grey.shade300),
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      height: 55,
+                      elevation: .5,
+                    ),
+                    SizedBox(width: 5), // Fixed distance between buttons
+                    MaterialButton(
+                      onPressed: () {
+                        setState(() {
+                          // Set the selected category to 'daily'
+                          selectedCategory = 'daily';
+                        });
+                      },
+                      minWidth: 150,
+                      child: Text(
+                        'Daily Tasks',
+                        style: TextStyle(
+                          color: selectedCategory == 'daily'
+                              ? Colors.white
+                              : Colors.purple,
+                        ),
+                      ),
+                      color: selectedCategory == 'daily'
+                          ? Colors.purple
+                          : Colors.white,
+                      shape: RoundedRectangleBorder(
+                        side: BorderSide(color: Colors.grey.shade300),
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      height: 55,
+                      elevation: .5,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
           // date selector
           DateTimeSelectionWidget(
             onTap: () {
@@ -270,8 +366,10 @@ class _TaskViewState extends State<TaskView> {
                   setState(() {
                     if (widget.task?.startAtDate == null) {
                       startDate = dateTime;
+                      endDate = startDate;
                     } else {
                       widget.task!.startAtDate = dateTime;
+                      widget.task!.endAtDate = dateTime;
                     }
                   });
                 },
@@ -286,7 +384,7 @@ class _TaskViewState extends State<TaskView> {
             onTap: () {
               DatePicker.showDatePicker(
                 context,
-                minDateTime: DateTime.now(),
+                minDateTime: startDate ?? DateTime.now(),
                 initialDateTime: showEndDateAsDateTime(endDate),
                 onConfirm: (dateTime, _) {
                   setState(() {

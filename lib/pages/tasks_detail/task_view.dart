@@ -1,8 +1,5 @@
-import 'dart:math';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:todo_app/main.dart';
 import 'package:todo_app/models/hive_task.dart';
@@ -138,15 +135,29 @@ class _TaskViewState extends State<TaskView> {
 
           Navigator.pop(context);
         } else {
-          print("Cannot be empty");
-          // Warning
-          // TODO: Handle empty fields case
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                "All fields must be filled",
+                style: TextStyle(color: Colors.white),
+              ),
+              backgroundColor: Colors.black,
+              duration: Duration(milliseconds: 500),
+            ),
+          );
         }
       }
     } catch (e) {
-      // Handle any exceptions that occur during the update process
-      print('An error occurred while updating the task: $e');
-      // Optionally, show an error message to the user
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            "An error occurred while updating the task",
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Colors.black,
+          duration: Duration(milliseconds: 500),
+        ),
+      );
     }
   }
 
@@ -156,27 +167,25 @@ class _TaskViewState extends State<TaskView> {
   }
 
   @override
-Widget build(BuildContext context) {
- var textTheme = Theme.of(context).textTheme;
- return GestureDetector(
-    onTap: () => FocusManager.instance.primaryFocus!.unfocus(),
-    child: Scaffold(
-      appBar: const TaskViewAppBar(),
-      
-      body: SingleChildScrollView( // This makes the entire content scrollable
-        child: Column(
-          children: [
-            _buildTopSideTexts(textTheme),
-            _buildMainTaskViewActivity(textTheme, context),
-          ],
+  Widget build(BuildContext context) {
+    var textTheme = Theme.of(context).textTheme;
+    return GestureDetector(
+      onTap: () => FocusManager.instance.primaryFocus!.unfocus(),
+      child: Scaffold(
+        appBar: const TaskViewAppBar(),
+        body: SingleChildScrollView(
+          // This makes the entire content scrollable
+          child: Column(
+            children: [
+              _buildTopSideTexts(textTheme),
+              _buildMainTaskViewActivity(textTheme, context),
+            ],
+          ),
         ),
       ),
-    ),
- );
-}
+    );
+  }
 
-
-  
   Widget _buildMainTaskViewActivity(TextTheme textTheme, BuildContext context) {
     return SizedBox(
       width: double.infinity,
@@ -192,7 +201,7 @@ Widget build(BuildContext context) {
                 style: textTheme.bodyMedium,
               ),
             ),
-        
+
             // task title
             RepTextField(
               controller: widget.titleTaskController,
@@ -203,11 +212,11 @@ Widget build(BuildContext context) {
                 title = inputTitle;
               },
             ),
-        
+
             const SizedBox(
               height: 10,
             ),
-        
+
             // task description
             RepTextField(
               controller: widget.descriptionTaskController,
@@ -290,7 +299,6 @@ Widget build(BuildContext context) {
                       ),
                     ],
                   ),
-                  
                 ],
               ),
             ),
@@ -317,7 +325,7 @@ Widget build(BuildContext context) {
               title: 'Start',
               date: showStartDate(startDate),
             ),
-        
+
             // date selector
             DateTimeSelectionWidget(
               onTap: () {
@@ -339,7 +347,7 @@ Widget build(BuildContext context) {
               title: 'Ends',
               date: showEndDate(endDate),
             ),
-        
+
             Container(
               margin: const EdgeInsets.only(top: 75, bottom: 75),
               child: Row(
@@ -380,7 +388,7 @@ Widget build(BuildContext context) {
                             ],
                           ),
                         ),
-              
+
                   // add or update task
                   MaterialButton(
                     onPressed: () {

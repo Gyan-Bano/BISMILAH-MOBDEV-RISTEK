@@ -6,6 +6,7 @@ part of 'hive_task.dart';
 // TypeAdapterGenerator
 // **************************************************************************
 
+// ignore: camel_case_types
 class hiveTaskAdapter extends TypeAdapter<hiveTask> {
   @override
   final int typeId = 0;

@@ -115,7 +115,7 @@ class _TaskWidgetState extends State<TaskWidget> {
                 ),
                 Text(
                  widget.task.category, // Assuming your task model has a 'category' field
-                 style: TextStyle(
+                 style: const TextStyle(
                     color: Colors.grey,
                     fontSize: 12,
                  ),
@@ -143,7 +143,7 @@ class _TaskWidgetState extends State<TaskWidget> {
               Align(
                 alignment: Alignment.centerRight,
                 child: Padding(
-                  padding: EdgeInsets.only(top: 10, bottom: 10),
+                  padding: const EdgeInsets.only(top: 10, bottom: 10),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

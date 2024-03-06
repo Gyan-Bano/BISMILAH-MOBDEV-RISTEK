@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
+// ignore: must_be_immutable
 class ToDoTile extends StatelessWidget {
   final String taskName;
   final bool taskCompleted;
@@ -20,7 +21,7 @@ class ToDoTile extends StatelessWidget {
       padding: const EdgeInsets.only(top: 25.0, left: 25.0, right: 25.0),
       child: Slidable(
         endActionPane: ActionPane(
-          motion: StretchMotion(),
+          motion: const StretchMotion(),
           children: [
             SlidableAction(
               onPressed: deleteFunction,
@@ -31,14 +32,14 @@ class ToDoTile extends StatelessWidget {
           ],
         ),
         child: Container(
-          padding: EdgeInsets.all(24),
+          padding: const EdgeInsets.all(24),
           child: Row(
             children: [
               // checkbox
               Checkbox(
                 value: taskCompleted,
                 onChanged: onChanged,
-                activeColor: Color(0xFF5039bd),
+                activeColor: const Color(0xFF5039bd),
               ),
               // task name
               Text(
@@ -51,7 +52,7 @@ class ToDoTile extends StatelessWidget {
             ],
           ),
           decoration: BoxDecoration(
-              color: Color(0xffede7fe),
+              color: const Color(0xffede7fe),
               borderRadius: BorderRadius.circular(12)),
         ),
       ),

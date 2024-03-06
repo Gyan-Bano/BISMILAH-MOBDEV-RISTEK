@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slider_drawer/flutter_slider_drawer.dart';
+import 'package:todo_app/main.dart';
 
 class HomeAppBar extends StatefulWidget {
   const HomeAppBar({super.key, required this.drawerKey});
@@ -18,8 +19,8 @@ class _HomeAppBarState extends State<HomeAppBar>
 
   @override
   void initState() {
-    animatecontroller =
-        AnimationController(vsync: this, duration: const Duration(milliseconds: 500));
+    animatecontroller = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 300));
     super.initState();
   }
 
@@ -29,7 +30,7 @@ class _HomeAppBarState extends State<HomeAppBar>
     super.dispose();
   }
 
-  // on toggle 
+  // on toggle
   void onDrawerToggle() {
     setState(() {
       isDrawerOpen = !isDrawerOpen;
@@ -45,6 +46,7 @@ class _HomeAppBarState extends State<HomeAppBar>
 
   @override
   Widget build(BuildContext context) {
+    var base = BaseWidget.of(context).dataStore.box;
     return SizedBox(
       width: double.infinity,
       height: 130,
@@ -71,7 +73,9 @@ class _HomeAppBarState extends State<HomeAppBar>
               padding: const EdgeInsets.only(left: 20),
               child: IconButton(
                   onPressed: () {
-                    // we need move all
+                    // delete all
+                    // base.isEmpty ? null :
+                    BaseWidget.of(context).dataStore.box.clear();
                   },
                   icon: const Icon(
                     CupertinoIcons.trash_fill,

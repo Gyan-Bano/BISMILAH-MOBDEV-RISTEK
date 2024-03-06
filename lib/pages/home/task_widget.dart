@@ -1,41 +1,84 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:todo_app/models/hive_task.dart';
+import 'package:intl/intl.dart';
+import 'package:todo_app/pages/tasks_detail/task_view.dart';
 
-class TaskWidget extends StatelessWidget {
+class TaskWidget extends StatefulWidget {
   const TaskWidget({
-    super.key,
-  });
+    Key? key,
+    required this.task,
+  }) : super(key: key);
+
+  final hiveTask task;
+  @override
+  _TaskWidgetState createState() => _TaskWidgetState();
+}
+
+class _TaskWidgetState extends State<TaskWidget> {
+  TextEditingController textEditingControllerForTitle = TextEditingController();
+  TextEditingController textEditingControllerForSubTitle =
+      TextEditingController();
+
+  @override
+  void initState() {
+    textEditingControllerForTitle.text = widget.task.title;
+    textEditingControllerForSubTitle.text = widget.task.subTitle;
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    textEditingControllerForTitle.dispose();
+    textEditingControllerForSubTitle.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        // navigate to see task detail 
+     onTap: () {
+      // navigate to see task detail
+        Navigator.push(
+          context, 
+          CupertinoPageRoute(
+            builder: (ctx) => TaskView(
+              titleTaskController: textEditingControllerForTitle,
+              descriptionTaskController: textEditingControllerForSubTitle,
+              task: widget.task,
+            ),
+          ),
+        );
       },
+
       child: AnimatedContainer(
-        margin: const EdgeInsets.symmetric(
-          horizontal: 16, vertical: 8
-        ),
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: Color(0xffede7fe),
-          borderRadius: BorderRadius.circular(8),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              offset: const Offset(0, 4),
-              blurRadius: 10
-          )]
-        ),
+            color: widget.task.isCompleted
+                ? const Color(0xffede7fe)
+                : Colors.white,
+            borderRadius: BorderRadius.circular(8),
+            boxShadow: [
+              BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  offset: const Offset(0, 4),
+                  blurRadius: 10)
+            ]),
         duration: const Duration(milliseconds: 600),
         child: ListTile(
           // check icon
           leading: GestureDetector(
             onTap: () {
               // check uncheck
+              widget.task.isCompleted = !widget.task.isCompleted;
+              widget.task.save();
             },
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 600),
               decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor,
+                color: widget.task.isCompleted
+                    ? Theme.of(context).primaryColor
+                    : Colors.white,
                 shape: BoxShape.circle,
                 border: Border.all(color: Colors.grey, width: .8),
               ),
@@ -45,28 +88,35 @@ class TaskWidget extends StatelessWidget {
               ),
             ),
           ),
-          
-          // task title 
-          title: const Padding(
+
+          // task title
+          title: Padding(
             padding: const EdgeInsets.only(top: 3, bottom: 5),
-            child: const Text(
-              "Done",
+            child: Text(
+              textEditingControllerForTitle.text,
               style: TextStyle(
-                color: Colors.black,
+                color: widget.task.isCompleted
+                    ? Theme.of(context).primaryColor
+                    : Colors.black,
                 fontWeight: FontWeight.w500,
+                decoration:
+                    widget.task.isCompleted ? TextDecoration.lineThrough : null,
               ),
             ),
           ),
-          
+
           // task detail
-          subtitle: const Column(
+          subtitle: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Description",
+                textEditingControllerForSubTitle.text,
                 style: TextStyle(
                   color: Colors.grey,
                   fontWeight: FontWeight.w300,
+                  decoration: widget.task.isCompleted
+                      ? TextDecoration.lineThrough
+                      : null,
                 ),
               ),
               // date of task
@@ -78,23 +128,27 @@ class TaskWidget extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        "Date",
+                        "Start: ${DateFormat.yMMMEd().format(widget.task.startAtDate)}",
                         style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey,
+                          fontSize: 12,
+                          color: widget.task.isCompleted
+                              ? Colors.grey
+                              : Colors.black,
                         ),
                       ),
                       Text(
-                        "SubDate",
+                        "Due: ${DateFormat.yMMMEd().format(widget.task.endAtDate)}",
                         style: TextStyle(
                           fontSize: 12,
-                          color: Colors.grey,
+                          color: widget.task.isCompleted
+                              ? Colors.grey
+                              : Colors.black,
                         ),
                       ),
                     ],
                   ),
                 ),
-              ),  
+              ),
             ],
           ),
         ),

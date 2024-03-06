@@ -1,25 +1,22 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:todo_app/pages/profile/profile_form.dart';
 
+// ignore: must_be_immutable
 class CustomDrawer extends StatelessWidget {
   CustomDrawer({super.key});
 
   // icons
   final List<IconData> icons = [
     CupertinoIcons.person_fill,
-    CupertinoIcons.info_circle_fill,
   ];
 
   List<String> texts = [
     "Profile",
-    "Details",
   ];
 
   @override
   Widget build(BuildContext context) {
-    var textTheme = Theme.of(context).textTheme;
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 90),
       color: Theme.of(context).primaryColor,

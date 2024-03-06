@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 class RepTextField extends StatelessWidget {
   const RepTextField({
@@ -25,7 +24,7 @@ class RepTextField extends StatelessWidget {
           controller: controller,
           maxLines: !isForDescription ? 3 : null,
           cursorHeight: !isForDescription ? 60 : null,
-          style: TextStyle(
+          style: const TextStyle(
             color: Colors.black,
           ),
           decoration: InputDecoration(

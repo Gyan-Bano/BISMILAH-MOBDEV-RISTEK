@@ -1,10 +1,10 @@
-import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
 
 part 'hive_task.g.dart';
 
 @HiveType(typeId: 0)
+// ignore: camel_case_types
 class hiveTask extends HiveObject {
   hiveTask({
     required this.id,

@@ -1,7 +1,6 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_slider_drawer/flutter_slider_drawer.dart';
 import 'package:todo_app/main.dart';
 import 'package:todo_app/models/hive_task.dart';
@@ -9,8 +8,6 @@ import 'package:todo_app/pages/home/home_page_appbar.dart';
 import 'package:todo_app/pages/drawer/slider_drawer.dart';
 import 'package:todo_app/pages/home/task_widget.dart';
 import 'package:todo_app/pages/tasks_detail/task_view.dart';
-import 'package:todo_app/utility/dialog_box.dart';
-import 'package:todo_app/utility/todo_tile.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
 
@@ -24,19 +21,11 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage>
     with SingleTickerProviderStateMixin {
   GlobalKey<SliderDrawerState> drawerKey = GlobalKey<SliderDrawerState>();
-  bool _showSortOptions = false;
-  late AnimationController _controller;
-  late Animation<double> _animation;
-  Set<String> _selectedFilters = {};
+  final Set<String> _selectedFilters = {};
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 300),
-      vsync: this,
-    );
-    _animation = Tween<double>(begin: 0, end: 1).animate(_controller);
   }
 
   // check value of circle indicator
@@ -177,7 +166,7 @@ class _MyHomePageState extends State<MyHomePage>
                           ),
                         ),
                         // space
-                        SizedBox(width: 25),
+                        const SizedBox(width: 25),
 
                         // top level task info
                         Column(
@@ -189,7 +178,7 @@ class _MyHomePageState extends State<MyHomePage>
                               style: textTheme.displayLarge
                                   ?.copyWith(fontWeight: FontWeight.bold),
                             ),
-                            SizedBox(height: 3),
+                            const SizedBox(height: 3),
                             Text(
                               "${checkDoneTask(tasks)} of ${tasks.length} task",
                               style: textTheme.titleMedium,
@@ -221,7 +210,7 @@ class _MyHomePageState extends State<MyHomePage>
                             spacing: 8.0,
                             children: [
                               FilterChip(
-                                label: Container(child: Text('Today Task')),
+                                label: const Text('Today Task'),
                                 selected:
                                     _selectedFilters.contains('Today Task'),
                                 showCheckmark: false,
@@ -236,7 +225,7 @@ class _MyHomePageState extends State<MyHomePage>
                                 },
                               ),
                               FilterChip(
-                                label: Text('Priority Task'),
+                                label: const Text('Priority Task'),
                                 selected:
                                     _selectedFilters.contains('Priority Task'),
                                 showCheckmark: false,
@@ -251,7 +240,7 @@ class _MyHomePageState extends State<MyHomePage>
                                 },
                               ),
                               FilterChip(
-                                label: Text('Daily Task'),
+                                label: const Text('Daily Task'),
                                 selected:
                                     _selectedFilters.contains('Daily Task'),
                                 showCheckmark: false,

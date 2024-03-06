@@ -90,20 +90,40 @@ class _TaskWidgetState extends State<TaskWidget> {
           ),
 
           // task title
-          title: Padding(
-            padding: const EdgeInsets.only(top: 3, bottom: 5),
-            child: Text(
-              textEditingControllerForTitle.text,
-              style: TextStyle(
-                color: widget.task.isCompleted
-                    ? Theme.of(context).primaryColor
-                    : Colors.black,
-                fontWeight: FontWeight.w500,
-                decoration:
-                    widget.task.isCompleted ? TextDecoration.lineThrough : null,
-              ),
-            ),
-          ),
+        title: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            double categoryWidth = 70; 
+            double availableWidth = constraints.maxWidth - categoryWidth;
+
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                ConstrainedBox(
+                 constraints: BoxConstraints(maxWidth: availableWidth),
+                 child: Text(
+                    textEditingControllerForTitle.text,
+                    style: TextStyle(
+                      color: widget.task.isCompleted
+                          ? Theme.of(context).primaryColor
+                          : Colors.black,
+                      fontWeight: FontWeight.w500,
+                      decoration: widget.task.isCompleted
+                          ? TextDecoration.lineThrough
+                          : null,
+                    ),
+                 ),
+                ),
+                Text(
+                 widget.task.category, // Assuming your task model has a 'category' field
+                 style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 12,
+                 ),
+                ),
+              ],
+            );
+          },
+        ),
 
           // task detail
           subtitle: Column(
@@ -147,7 +167,9 @@ class _TaskWidgetState extends State<TaskWidget> {
                       ),
                     ],
                   ),
+                  
                 ),
+                
               ),
             ],
           ),

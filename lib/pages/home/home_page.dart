@@ -12,6 +12,7 @@ import 'package:todo_app/pages/tasks_detail/task_view.dart';
 import 'package:todo_app/utility/dialog_box.dart';
 import 'package:todo_app/utility/todo_tile.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:intl/intl.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key}) : super(key: key);
@@ -20,9 +21,23 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateMixin{
   GlobalKey<SliderDrawerState> drawerKey = GlobalKey<SliderDrawerState>();
+  bool _showSortOptions = false;
+  late AnimationController _controller;
+  late Animation<double> _animation;
+  Set<String> _selectedFilters = {}; 
 
+
+  @override
+  void initState() {
+      super.initState();
+      _controller = AnimationController(
+        duration: const Duration(milliseconds: 300),
+        vsync: this,
+      );
+      _animation = Tween<double>(begin: 0, end: 1).animate(_controller);
+  }
   // check value of circle indicator
   dynamic valueOfIndicator(List<hiveTask> task) {
     if (task.isNotEmpty) {
@@ -48,13 +63,33 @@ class _MyHomePageState extends State<MyHomePage> {
     TextTheme textTheme = Theme.of(context).textTheme;
 
     final base = BaseWidget.of(context);
+    String todayDate = DateFormat('EEEE, MMMM d').format(DateTime.now());
 
     return ValueListenableBuilder(
       valueListenable: base.dataStore.listenToTask(),
-      builder: (ctx, Box<hiveTask> box, Widget? child) {
-        var tasks = box.values.toList();
+    builder: (ctx, Box<hiveTask> box, Widget? child) {
+      var tasks = box.values.toList();
 
-        tasks.sort((a, b) => a.endAtDate.compareTo(b.endAtDate));
+      tasks = tasks.where((task) {
+        if (_selectedFilters.contains('Daily Task') && task.category != 'daily') {
+          return false;
+        }
+        if (_selectedFilters.contains('Priority Task') && task.category != 'priority') {
+          return false;
+        }
+        if (_selectedFilters.contains('Today Task')) {
+          DateTime today = DateTime.now();
+          today = DateTime(today.year, today.month, today.day); 
+          if (!(task.startAtDate.compareTo(today) <= 0 && task.endAtDate.compareTo(today) >= 0)) {
+            return false;
+          }
+        }
+
+        return true;
+      }).toList();
+
+      // Sort tasks if needed
+      tasks.sort((a, b) => a.endAtDate.compareTo(b.endAtDate));
         return Scaffold(
           backgroundColor: Colors.white,
           // floating action button
@@ -108,9 +143,15 @@ class _MyHomePageState extends State<MyHomePage> {
               height: double.infinity,
               child: Column(
                 children: [
-                  // custom app bar
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      todayDate,
+                      style: textTheme.titleMedium,
+                    ),
+                  ),
                   Container(
-                    margin: const EdgeInsets.only(top: 60),
+                    margin: const EdgeInsets.only(top: 30),
                     width: double.infinity,
                     height: 100,
                     child: Row(
@@ -161,6 +202,68 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
 
+                  // Filter section
+                 Container(
+                  
+                    margin: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+                    child: SingleChildScrollView (
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    
+                      children: [
+
+                        Wrap(
+                          spacing: 8.0, 
+                          children: [
+                            FilterChip(
+                              label: Container(child: Text('Today Task')),
+                              selected: _selectedFilters.contains('Today Task'),
+                              showCheckmark: false,
+                              onSelected: (bool value) {
+                                setState(() {
+                                  if (value) {
+                                    _selectedFilters.add('Today Task');
+                                  } else {
+                                    _selectedFilters.remove('Today Task');
+                                  }
+                                });
+                              },
+                            ),
+                            FilterChip(
+                              label: Text('Priority Task'),
+                              selected: _selectedFilters.contains('Priority Task'),
+                              showCheckmark: false,
+                              onSelected: (bool value) {
+                                setState(() {
+                                  if (value) {
+                                    _selectedFilters.add('Priority Task');
+                                  } else {
+                                    _selectedFilters.remove('Priority Task');
+                                  }
+                                });
+                              },
+                            ),
+                            FilterChip(
+                              label: Text('Daily Task'),
+                              selected: _selectedFilters.contains('Daily Task'),
+                              showCheckmark: false,
+                              onSelected: (bool value) {
+                                setState(() {
+                                  if (value) {
+                                    _selectedFilters.add('Daily Task');
+                                  } else {
+                                    _selectedFilters.remove('Daily Task');
+                                  }
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                   ),
+                 ),
                   // tasks
                   Expanded(
                     child: tasks.isNotEmpty
@@ -174,7 +277,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                   direction: DismissDirection.horizontal,
                                   key: Key(task.id.toString()),
                                   onDismissed: (_) {
-                                     base.dataStore.deleteTask(task: task).then((_) {
+                                    base.dataStore
+                                        .deleteTask(task: task)
+                                        .then((_) {
                                       setState(() {
                                         tasks.removeAt(index);
                                       });
@@ -196,7 +301,6 @@ class _MyHomePageState extends State<MyHomePage> {
                                       )
                                     ],
                                   ),
-                                 
                                   child: TaskWidget(
                                     task: task,
                                   ));

@@ -23,13 +23,14 @@ class hiveTaskAdapter extends TypeAdapter<hiveTask> {
       startAtDate: fields[3] as DateTime,
       endAtDate: fields[4] as DateTime,
       isCompleted: fields[5] as bool,
+      category: fields[6] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, hiveTask obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -41,7 +42,9 @@ class hiveTaskAdapter extends TypeAdapter<hiveTask> {
       ..writeByte(4)
       ..write(obj.endAtDate)
       ..writeByte(5)
-      ..write(obj.isCompleted);
+      ..write(obj.isCompleted)
+      ..writeByte(6)
+      ..write(obj.category);
   }
 
   @override
